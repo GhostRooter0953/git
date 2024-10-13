@@ -1,0 +1,8 @@
+---
+- name: install
+  include_tasks: install.yml
+  when: git_setup == "full" or git_setup == "install"
+
+- name: configure
+  import_tasks: configure.yml
+  when: git_setup == "full" or git_setup == "configure"

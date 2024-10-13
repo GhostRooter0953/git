@@ -1,0 +1,20 @@
+---
+- name: install required packages
+  apt:
+    name:
+      - curl
+      - gnupg
+      - apt-transport-https
+    update_cache: true
+    cache_valid_time: 86400
+
+- name: add ppa
+  apt_repository:
+    repo: 'ppa:git-core/ppa'
+
+- name: install packages
+  apt:
+    name: git
+    state: present
+    update_cache: true
+    cache_valid_time: 86400

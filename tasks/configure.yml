@@ -1,0 +1,48 @@
+---
+- name: install git-lfs
+  block:
+    - name: get source list
+      get_url:
+        url: "{{ git_lfs_apt_config_url }}"
+        dest: /etc/apt/sources.list.d/github_git-lfs.list
+        mode: 0644
+
+    - name: check if signing key exists
+      stat:
+        path: "{{ git_lfs_gpg_keyring }}"
+      register: git_lfs_gpg_stat_result
+
+    - name: download signing key
+      get_url:
+        url: https://packagecloud.io/github/git-lfs/gpgkey
+        dest: /tmp/github_git-lfs.gpg
+      when: not git_lfs_gpg_stat_result.stat.exists
+
+    - name: ensure that keyring directory exists
+      file:
+        path: "{{ git_lfs_gpg_keyring | dirname }}"
+        state: directory
+
+    - name: dearmor signing key
+      shell: "cat /tmp/github_git-lfs.gpg | gpg --dearmor > {{ git_lfs_gpg_keyring }}"
+      when: not git_lfs_gpg_stat_result.stat.exists
+
+    - name: remove tmp file
+      ansible.builtin.file:
+        path: /tmp/github_git-lfs.gpg
+        state: absent
+
+    - name: install git-lfs package
+      apt:
+        name: git-lfs
+        update_cache: true
+        cache_valid_time: 86400
+
+    - name: activate git-lfs extension
+      command: git lfs install # noqa 303
+      become: true
+      become_user: "{{ item }}"
+      changed_when: false
+      loop: "{{ git_lfs.users }}"
+      when: git_lfs.users is defined
+  when: git_lfs.enabled

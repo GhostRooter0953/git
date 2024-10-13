@@ -1,0 +1,8 @@
+---
+git_setup: full
+
+git_lfs:
+  enabled: false
+
+git_lfs_apt_config_url: "https://packagecloud.io/install/repositories/github/git-lfs/config_file.list?os=ubuntu&dist={{ ansible_distribution_release }}&source=script"
+git_lfs_gpg_keyring: /etc/apt/keyrings/github_git-lfs-archive-keyring.gpg
